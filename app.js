@@ -25,6 +25,7 @@ var express = require('express')
 // Configuration
 
 app.configure(function(){
+  app.enable('jsonp callback');
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.bodyParser());
@@ -71,7 +72,7 @@ app.get('/', function(req, res){
   });
 });
 
-app.get('/scrape', function(req, res){
+app.get('/scrape.json', function(req, res){
   $.when(authorized(req))
     .done(function(user){
 
