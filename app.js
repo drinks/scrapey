@@ -1,7 +1,26 @@
+/*
+     ____                                                __
+    /\  _`\  Y'know, for stealing content from websites /\ \
+    \ \,\L\_\    ___  _ __   __     _____     __  __  __\ \ \
+     \/_\__ \   /'___\\`'__\'__`\  /\ '__`\ /'__`\\ \/\ \\ \ \
+       /\ \L\ \/\ \__/ \ \/\ \L\.\_\ \ \L\ \\  __/ \ \_\ \\ \_\
+       \ `\____\ \____\ \_\ \__/.\_\\ \ ,__/ \____\/`____ \\/\_\
+        \/_____/\/____/\/_/\/__/\/_/ \ \ \/ \/____/`/___/> \\/_/
+                                      \ \_\           /\___/
+          By Dan Drinkard.version 0.1  \/_/           \/__/
 
-/**
-* Module dependencies.
+    =============================================================
+
+    Use it like this:
+    http://scrapey.herokuapp.com/scrape.json?
+        apikey=mykey&
+        url=http://example.com&
+        scraper=http://scrapey.s3.amazonaws.com/example.com.js
+
+    =============================================================
 */
+
+// Modules & Inits
 
 var express = require('express')
   , app = module.exports = express.createServer()
@@ -54,12 +73,12 @@ var authorized = function(req){
 
   User.findOne({key: key}, function(err, doc){
     if(err)
-      dfd.reject();
+      dfd.reject('There was an error connecting to the database.');
 
     if(doc)
       dfd.resolve(doc);
     else
-      dfd.reject();
+      dfd.reject('A valid apikey is required.');
   });
   return dfd.promise();
 }
@@ -68,11 +87,11 @@ var authorized = function(req){
 
 app.get('/', function(req, res){
   res.render('index', {
-    title: 'Express'
+    title: 'Scrapey'
   });
 });
 
-app.get('/scrape.json', function(req, res){
+app.get('/scrape.:format', function(req, res){
   $.when(authorized(req))
     .done(function(user){
 
@@ -88,7 +107,7 @@ app.get('/scrape.json', function(req, res){
           , scripts: [ 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js', req.query.scraper ]
           , done: function(errors, window){
               if(errors){
-                res.json({errors: errors});
+                ressend({errors: errors});
               }
               delete req.query.useragent;
               delete req.query.url;
@@ -96,17 +115,21 @@ app.get('/scrape.json', function(req, res){
               delete req.query.apikey;
               console.log('Got options: ', req.query);
 
-              res.json(window.run_scraper(window.jQuery, req.query));
+              try{
+                ressend(window.run_scraper(window.jQuery, req.query));
+              }catch(e){
+                ressend({errors: [e.message]});
+              }
             }
         });
 
       }catch(e){
-        res.json({errors: [e.message]});
+        ressend({errors: [e.message]});
       }
 
-    }).fail(function(){
+    }).fail(function(msg){
 
-      res.json({errors: ['valid apikey required.']});
+      ressend({errors: [msg]});
 
     });
 
