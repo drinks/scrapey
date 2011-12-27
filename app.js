@@ -107,7 +107,7 @@ app.get('/scrape.:format', function(req, res){
           , scripts: [ 'http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js', req.query.scraper ]
           , done: function(errors, window){
               if(errors){
-                ressend({errors: errors});
+                res.send({errors: errors});
               }
               delete req.query.useragent;
               delete req.query.url;
@@ -116,20 +116,20 @@ app.get('/scrape.:format', function(req, res){
               console.log('Got options: ', req.query);
 
               try{
-                ressend(window.run_scraper(window.jQuery, req.query));
+                res.send(window.run_scraper(window.jQuery, req.query));
               }catch(e){
-                ressend({errors: [e.message]});
+                res.send({errors: [e.message]});
               }
             }
         });
 
       }catch(e){
-        ressend({errors: [e.message]});
+        res.send({errors: [e.message]});
       }
 
     }).fail(function(msg){
 
-      ressend({errors: [msg]});
+      res.send({errors: [msg]});
 
     });
 
