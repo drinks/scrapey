@@ -24,7 +24,7 @@
 
 var express = require('express')
   , app = module.exports = express.createServer()
-  , $ = require('jQuery')
+  , Q = require('q')
   , jsdom = require('jsdom')
   , rest = require('restler')
   , mongoose = require('mongoose')
@@ -68,7 +68,7 @@ app.configure('production', function(){
 
 var authorized = function(req){
   var User = models.User(mongoose);
-  var dfd = $.Deferred();
+  var dfd = Q.defer();
   var key = req.query.apikey || req.headers['X-APIKEY'];
 
   User.findOne({key: key}, function(err, doc){
@@ -92,7 +92,7 @@ app.get('/', function(req, res){
 });
 
 app.get('/scrape.:format', function(req, res){
-  $.when(authorized(req))
+  Q.when(authorized(req))
     .done(function(user){
 
       var headers = {
