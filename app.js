@@ -139,6 +139,6 @@ app.get('/scrape.:format', function(req, res){
 
 var port = settings.PORT || 3000
 app.listen(port, function(){
-  mongoose.connect('mongodb://' + settings.MONGODB_USER + ':' + settings.MONGODB_PASS + '@' + settings.MONGODB_URL);
+  mongoose.connect(settings.MONGOLAB_URI);
   console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
 });
