@@ -71,6 +71,10 @@ var authorized = function(req){
   var dfd = Q.defer();
   var key = req.query.apikey || req.headers['X-APIKEY'];
 
+  if(settings.TEST_KEY && key == settings.TEST_KEY){
+    dfd.resolve('TEST_KEY')
+  }
+
   User.findOne({key: key}, function(err, doc){
     if(err)
       dfd.reject('There was an error connecting to the database.');
